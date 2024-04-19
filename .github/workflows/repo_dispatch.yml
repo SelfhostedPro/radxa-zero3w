@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  fork-repository-dispatch:
+  repository_dispatch:
     name: 📢 Run repository dispatch to default fork branch
     if: ${{ github.repository_owner != 'armbian' }}
     runs-on: ubuntu-latest

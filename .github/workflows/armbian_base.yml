@@ -9,8 +9,12 @@ jobs:
     steps:
       - uses: armbian/build@main
         with:
-          armbian_token:     "${{ secrets.GITHUB_TOKEN }}"  # GitHub token
-          armbian_release:   "trixie"                        # userspace
-          armbian_target:    "build"                        # build=image, kernel=kernel
-          armbian_board:     "radxa-zero3"                   # build target
-          armbian_ui:        "minimal"
+          armbian_token: "${{ secrets.GITHUB_TOKEN }}" # GitHub token
+          armbian_release: "trixie"
+          armbian_target: "build"
+          armbian_board: "radxa-zero3"
+          armbian_ui: "minimal"
+          armbian_runner_clean: true
+          armbian_compress: "sha,xz"
+          armbian_release_tittle: "Radxa Zero 3 W Images"
+          armbian_release_body: "Build with [Armbian tools](https://github.com/armbian/build)"
