@@ -1,4 +1,4 @@
-name: Forked Helper
+name: Dispatch Helper
 
 on:
   push:
@@ -13,25 +13,6 @@ jobs:
     if: ${{ github.repository_owner != 'armbian' }}
     runs-on: ubuntu-latest
     steps:
-      # - name: Assign secret
-      #   id: get_dispatch_secret
-      #   run: echo 'name=dispatch_secret::${{ secrets.ARMBIAN_SELF_DISPATCH_TOKEN }}' >> $GITHUB_OUTPUT
-      - name: Get event details
-        id: get_event_details
-        # Process JSON according https://github.com/orgs/community/discussions/26288
-        run: |
-          JSON=$(cat ${{ github.event_path }})
-          JSON="${JSON//'%'/'%25'}"
-          JSON="${JSON//$'\n'/'%0A'}"
-          JSON="${JSON//$'\r'/'%0D'}"
-          echo "$JSON"
-          echo "event_details=${JSON}" >> $GITHUB_OUTPUT
-
-      - name: Debug Event Details
-        run: |
-          echo ${{ steps.get_event_details.outputs.event_details }}
-          echo $(cat ${{ github.event_path }})
-          
       - name: Dispatch event on forked repostitory
         uses: peter-evans/repository-dispatch@v3
         with:
