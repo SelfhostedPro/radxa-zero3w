@@ -21,10 +21,10 @@ jobs:
         # Process JSON according https://github.com/orgs/community/discussions/26288
         run: |
           JSON=$(cat ${{ github.event_path }})
-          echo "$JSON"
-          # JSON="${JSON//'%'/'%25'}"
+          JSON="${JSON//'%'/'%25'}"
           # JSON="${JSON//$'\n'/'%0A'}"
           # JSON="${JSON//$'\r'/'%0D'}"
+          echo "$JSON"
           echo "name=event_details::${JSON}" >> $GITHUB_OUTPUT
 
       - name: Debug Event Details
