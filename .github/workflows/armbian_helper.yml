@@ -19,7 +19,7 @@ jobs:
 
       - name: test dispatch secret
         run: |
-          echo "${GITHUB_ENV}"
+          echo "$GITHUB_ENV"
 
       - name: Get event details
         id: get_event_details
