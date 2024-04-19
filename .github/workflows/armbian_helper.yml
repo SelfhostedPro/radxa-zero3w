@@ -25,7 +25,7 @@ jobs:
           JSON="${JSON//$'\n'/'%0A'}"
           JSON="${JSON//$'\r'/'%0D'}"
           echo "$JSON"
-          echo "name=event_details::${JSON}" >> $GITHUB_OUTPUT
+          echo "event_details=${JSON}" >> $GITHUB_OUTPUT
 
       - name: Debug Event Details
         run: |
@@ -44,5 +44,5 @@ jobs:
               "ref": "${{ github.ref }}",
               "base_ref": "${{ github.base_ref }}",
               "sha": "${{ github.sha }}",
-              "event_details": ${{ steps.get_event_details.outputs.event_details }}
+              "event_details": ${{ toJson(steps.get_event_details.outputs) }}
             }
