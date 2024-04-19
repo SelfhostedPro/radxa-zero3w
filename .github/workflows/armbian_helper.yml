@@ -44,5 +44,5 @@ jobs:
               "ref": "${{ github.ref }}",
               "base_ref": "${{ github.base_ref }}",
               "sha": "${{ github.sha }}",
-              "event_details": ${{ toJson(steps.get_event_details.outputs) }}
+              "event_details": ${{ toJson(steps.get_event_details.outputs.event_details) }}
             }
