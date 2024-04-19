@@ -1,6 +1,8 @@
 name: "Build Armbian"
 on:
   workflow_dispatch:
+  repository_dispatch:
+    types: ["armbian"]
 jobs:
   build-armbian:
     runs-on: ubuntu-latest
