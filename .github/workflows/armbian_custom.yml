@@ -47,6 +47,7 @@ jobs:
       - name: "Checkout Armbian os"
         uses: actions/checkout@v4
         with:
+          ref: 24.5.0-trunk.434
           repository: armbian/os
           fetch-depth: 0
           clean: false
