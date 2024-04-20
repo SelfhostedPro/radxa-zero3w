@@ -1,5 +1,5 @@
 name: "Build Custom Armbian Images"
-run-name: "Building ${{ github.ref_name }} Custom Armbian Images v${{ github.run_number }}"
+run-name: "Building ${{ github.ref_name }} Custom Armbian Images #${{ github.run_number }}"
 on:
   workflow_dispatch:
   repository_dispatch:
@@ -120,7 +120,7 @@ jobs:
         with:
           name: "${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
           path: |
-            build/output/images/*.gz
+            build/output/images/
 
   release:
     runs-on: ubuntu-latest
