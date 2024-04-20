@@ -3,45 +3,18 @@ on:
   workflow_dispatch:
   repository_dispatch:
     types: ["armbian"]
-concurrency:
-  group: ${{ github.run_id }}-base
-  cancel-in-progress: false
 jobs:
   build-armbian:
-    # Allow writing packages
-    permissions:
-      contents: read
-      packages: write
-    strategy:
-      fail-fast: false
-      matrix:
-        release:
-          - trixie
-          - bullseye
-        ui:
-          - minimal
-          - server
-          - xfce
-        kernel:
-          - legacy
-          - current
-          - vendor
     runs-on: ubuntu-latest
-
     steps:
-      - name: Get current date
-        id: date
-        run: echo "DATE=(date +'%y.%m.%d')" >> "$GITHUB_OUTPUT"
-
       - uses: armbian/build@main
         with:
           armbian_token: "${{ secrets.GITHUB_TOKEN }}" # GitHub token
-          armbian_release: "${{ matrix.release }}"
+          armbian_release: "trixie"
           armbian_target: "build"
           armbian_board: "radxa-zero3"
-          armbian_ui: "${{ matrix.ui }}"
-          armbian_kernel_branch: "${{ matrix.kernel }}"
+          armbian_ui: "minimal"
+          # armbian_runner_clean: true
           armbian_compress: "sha,xz"
-          armbian_artifacts: "build/output/images/"
-          armbian_release_tittle: "${{ steps.date.output.DATE }} Radxa Zero 3 W Images"
+          armbian_release_tittle: "Radxa Zero 3 W Images"
           armbian_release_body: "Build with [Armbian tools](https://github.com/armbian/build)"
