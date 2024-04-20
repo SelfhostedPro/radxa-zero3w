@@ -54,14 +54,4 @@ function fix_wifi_driver() {
     apt --fix-broken install
 }
 
-# function add_wifi_creds() {
-#     echo "Writing ${SDCARD}/etc/wpa_supplicant/wpa_supplicant.conf"
-#     echo ${SUPPLICANT_CONTENT}
-#     echo ${SUPPLICANT_CONTENT} > ${SDCARD}/etc/wpa_supplicant/wpa_supplicant.conf
-    
-#     echo "Writing ${SDCARD}/etc/network/interfaces"
-#     echo ${INTERFACE_CONTENT}
-#     echo ${INTERFACE_CONTENT} | tee -a ${SDCARD}/etc/network/interfaces
-# }
-
 Main "$@"
