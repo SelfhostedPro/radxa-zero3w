@@ -110,7 +110,7 @@ jobs:
           BRANCH="${{ matrix.kernel }}" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_CONFIGURE="no" \
-          COMPRESS_OUTPUTIMAGE="sha,img,xz,gz" \
+          COMPRESS_OUTPUTIMAGE="sha,xz" \
           BUILD_DESKTOP="${BUILD_DESKTOP}" \
           BUILD_MINIMAL="${BUILD_MINIMAL}" \
           DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
@@ -125,9 +125,9 @@ jobs:
         run: |
           ls -R build/output/images/
 
-      - name: Compress Images
+      - name: Decompress Image
         run: |
-          pigz -k -9 build/output/images/*.img
+          unxz -k build/output/images/*.xz
 
         # Upload Armbian images to artifacts (we'll download them and add them to the release later).
       - name: Upload Armbian Artifacts for Release
@@ -138,6 +138,7 @@ jobs:
           path: |
             build/output/images/*
             !build/output/images/*.img
+
       - name: Build Diet PI
         if: env.BUILD_DIETPI == true
         shell: bash
@@ -171,7 +172,7 @@ jobs:
         with:
           tag: "${{ env.DATE }}"
           name: "${{ env.DATE }} Radxa Images"
-          artifacts: "./*.txt,./*.gz,./*.sha"
+          artifacts: "./*.txt,./*.xz,./*.sha"
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
