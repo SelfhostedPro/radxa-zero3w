@@ -140,7 +140,7 @@ jobs:
       - name: Build Diet PI
         shell: bash
         run: |
-          G_GITOWNER='MichaIng' G_GITBRANCH='master' SOURCE_TYPE='Image' FP_SOURCE_IMG='./build/output/images/*.img' CLONING_TOOL='dd' bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager')" 'DietPi-Build' --add-dos-part
+          G_GITOWNER='MichaIng' G_GITBRANCH='master' SOURCE_TYPE='Image' FP_SOURCE_IMG='./build/output/images/*.img' CLONING_TOOL='dd' bash -c "sudo $(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager')" 'DietPi-Build' --add-dos-part
 
     outputs:
       armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
