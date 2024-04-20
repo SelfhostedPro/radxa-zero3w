@@ -65,10 +65,12 @@ jobs:
 
       - name: Armbian Customisations
         shell: bash
+        id: customisation
         run: |
 
           # read version from upstream Armbian OS
           cat os/stable.json | jq '.version' | sed "s/\"//g" | sed 's/^/ARMBIAN_VERSION=/' >> $GITHUB_ENV
+          echo "ARMBIAN_VERSION=$(cat os/stable.json | jq '.version' | sed "s/\"//g" | sed 's/^/ARMBIAN_VERSION=/')" >> $GITHUB_OUTPUT
           # [[ "${{ inputs.armbian_version }}" != '' ]] && echo "ARMBIAN_VERSION=${{ inputs.armbian_version }}" >> $GITHUB_ENV
 
           # copy os userpatches and custom
@@ -127,11 +129,12 @@ jobs:
       - name: Build Diet PI
         shell: bash
         run: |
-          sudo bash -c "G_GITOWNER='MichaIng' G_GITBRANCH='master' SOURCE_TYPE='Image' FP_SOURCE_IMG=./build/output/images/*.img $(curl -sSf https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager)" 'DietPi-Build' --add-dos-part
+          sudo bash -c "G_GITOWNER='MichaIng' G_GITBRANCH='master' SOURCE_TYPE='Image' FP_SOURCE_IMG='./build/output/images/*.img' CLONING_TOOL='dd' $(curl -sSf https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager)" 'DietPi-Build' --add-dos-part
 
     outputs:
       armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
       date: ${{ steps.date.output.DATE }}
+      armbian-version: ${{ steps.customisation.output.ARMBIAN_VERSION }}
 
   release:
     runs-on: ubuntu-latest
@@ -146,8 +149,10 @@ jobs:
       - name: Display Artifact Listing
         run: echo "${{ toJson(needs.build-armbian.outputs.armbian-artifacts) }}"
       - uses: ncipollo/release-action@v1
+        env:
+          RELEASE_TAG: "${{ needs.build-armbian.outputs.armbian-version }}"
         with:
-          tag: "${{ needs.build-armbian.outputs.date }}"
+          tag: "${{ env.RELEASE_TAG }}"
           name: "${{ steps.date.output.DATE }} Radxa Images"
           artifacts: "./"
           allowUpdates: true
