@@ -147,7 +147,7 @@ jobs:
     steps:
       - name: Get current date
         id: date
-        run: echo "DATE=(date +'%y.%m.%d')" >> $GITHUB_ENV
+        run: echo "DATE=$(date +'%y.%m.%d')" >> $GITHUB_ENV
 
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
