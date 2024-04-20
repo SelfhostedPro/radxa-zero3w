@@ -24,15 +24,15 @@ jobs:
       matrix:
         release:
           - trixie
-          - bookworm
+          # - bookworm
         ui:
-          - minimal
+          # - minimal
           - server
-          - xfce
+          # - xfce
         kernel:
           # - legacy
           - vendor
-    name: "Base: ${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}"
+    name: "${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}"
     runs-on: ubuntu-latest
     steps:
       - name: Get current date
