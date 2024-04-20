@@ -136,7 +136,7 @@ jobs:
       - name: Build Diet PI
         shell: bash
         run: |
-          sudo bash -c "G_GITOWNER=MichaIng G_GITBRANCH=master SOURCE_TYPE=Image FP_SOURCE_IMG='./*.img' FP_ROOT_DEV=/dev/loop0p2 CLONING_TOOL=dd OUTPUT_IMG_NAME=dietpi_armbian OUTPUT_IMG_EXT=img; \
+          sudo bash -c "G_GITOWNER=MichaIng G_GITBRANCH=master FP_ROOT_DEV=/dev/loop0p2 CLONING_TOOL=dd OUTPUT_IMG_NAME=dietpi_armbian OUTPUT_IMG_EXT=img; \
             $(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager')" -i ./*.img --add-dos-part
     outputs:
       armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
