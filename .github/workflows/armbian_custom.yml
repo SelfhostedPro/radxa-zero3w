@@ -16,6 +16,9 @@ permissions:
   contents: read
   packages: write
 
+env:
+  ARMBIAN_VERSION: 24.5.0-trunk.434
+
 jobs:
   setup:
     runs-on: ubuntu-latest
@@ -47,7 +50,6 @@ jobs:
       - name: "Checkout Armbian os"
         uses: actions/checkout@v4
         with:
-          ref: 24.5.0-trunk.434
           repository: armbian/os
           fetch-depth: 0
           clean: false
@@ -69,20 +71,10 @@ jobs:
           clean: false
           path: custom
 
-      - name: "Get Armbian Version"
-        run: |
-          echo "ARMBIAN_VERSION=$(cat os/stable.json | jq '.version' | sed "s/\"//g" | sed 's/^/ARMBIAN_VERSION=/')"
-          echo "ARMBIAN_VERSION=$(cat os/stable.json | jq '.version' | sed "s/\"//g" | sed 's/^/ARMBIAN_VERSION=/')" >> $GITHUB_OUTPUT
-
       - name: Armbian Customisations
         shell: bash
         id: customisation
         run: |
-
-          # read version from upstream Armbian OS
-          cat os/stable.json | jq '.version' | sed "s/\"//g" | sed 's/^/ARMBIAN_VERSION=/' >> $GITHUB_ENV
-          # [[ "${{ inputs.armbian_version }}" != '' ]] && echo "ARMBIAN_VERSION=${{ inputs.armbian_version }}" >> $GITHUB_ENV
-
           # copy os userpatches and custom
           mkdir -pv build/userpatches
           rsync -av os/userpatches/. build/userpatches/
@@ -146,7 +138,6 @@ jobs:
 
     outputs:
       armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
-      armbian-version: ${{ steps.customisation.output.ARMBIAN_VERSION }}
 
   release:
     runs-on: ubuntu-latest
@@ -174,7 +165,7 @@ jobs:
           token: "${{ secrets.ARMBIAN_SELF_DISPATCH_TOKEN }}"
           body: |
             Radxa Custom Images:
-            {{  }}
+            based on Armbian v{{ env.ARMBIAN_VERSION }}
 
       # - uses: armbian/build@main
       #   with:
