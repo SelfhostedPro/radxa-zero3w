@@ -178,7 +178,7 @@ jobs:
           token: "${{ secrets.ARMBIAN_SELF_DISPATCH_TOKEN }}"
           body: |
             Radxa Custom Images:
-            based on Armbian v{{ env.ARMBIAN_VERSION }}
+            based on Armbian v${{ env.ARMBIAN_VERSION }}
 
       # - uses: armbian/build@main
       #   with:
