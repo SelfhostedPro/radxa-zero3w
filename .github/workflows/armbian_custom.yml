@@ -139,6 +139,7 @@ jobs:
             build/output/images/*
             !build/output/images/*.img
       - name: Build Diet PI
+        if: env.BUILD_DIETPI == true
         shell: bash
         env:
           G_GITOWNER: MichaIng
