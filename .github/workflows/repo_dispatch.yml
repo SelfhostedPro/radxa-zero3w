@@ -18,7 +18,7 @@ jobs:
         with:
           token: ${{ secrets.ARMBIAN_SELF_DISPATCH_TOKEN }}
           repository: ${{ github.repository }}
-          event-type: armbian
+          event-type: custom
           client-payload: >
             {
               "event": "${{ github.event_name }}",
