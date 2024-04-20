@@ -125,7 +125,8 @@ jobs:
           ls -R build/output/images/
       - name: Compress Images
         run: |
-          pigz -k -9 ./*.img
+          pigz -k -9 build/output/images/*.img
+          
         # Upload Armbian images to artifacts (we'll download them and add them to the release later).
       - name: Upload Armbian Artifacts for Release
         id: artifacts
