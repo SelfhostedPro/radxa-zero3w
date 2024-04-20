@@ -28,7 +28,7 @@ jobs:
         kernel:
           - legacy
           - vendor
-    name: Build - ${{ matrix.release }} | ${{ matrix.ui }}-${{ matrix.kernel }}
+    name: Build - ${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}
     runs-on: ubuntu-latest
 
     steps:
