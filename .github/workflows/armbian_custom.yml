@@ -63,6 +63,11 @@ jobs:
           clean: false
           path: custom
 
+      - name: "Get Armbian Version"
+        run: |
+          echo "ARMBIAN_VERSION=$(cat os/stable.json | jq '.version' | sed "s/\"//g" | sed 's/^/ARMBIAN_VERSION=/')"
+          echo "ARMBIAN_VERSION=$(cat os/stable.json | jq '.version' | sed "s/\"//g" | sed 's/^/ARMBIAN_VERSION=/')" >> $GITHUB_OUTPUT
+
       - name: Armbian Customisations
         shell: bash
         id: customisation
@@ -70,7 +75,6 @@ jobs:
 
           # read version from upstream Armbian OS
           cat os/stable.json | jq '.version' | sed "s/\"//g" | sed 's/^/ARMBIAN_VERSION=/' >> $GITHUB_ENV
-          echo "ARMBIAN_VERSION=$(cat os/stable.json | jq '.version' | sed "s/\"//g" | sed 's/^/ARMBIAN_VERSION=/')" >> $GITHUB_OUTPUT
           # [[ "${{ inputs.armbian_version }}" != '' ]] && echo "ARMBIAN_VERSION=${{ inputs.armbian_version }}" >> $GITHUB_ENV
 
           # copy os userpatches and custom
