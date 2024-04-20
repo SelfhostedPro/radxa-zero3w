@@ -16,6 +16,7 @@ permissions:
   contents: read
   packages: write
 
+# Force specific version of armbian
 env:
   ARMBIAN_VERSION: 24.5.0-trunk.434
 
@@ -110,13 +111,14 @@ jobs:
           BRANCH="${{ matrix.kernel }}" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_CONFIGURE="no" \
+          COMPRESS_OUTPUTIMAGE="sha,img,xz" \
           BUILD_DESKTOP="${BUILD_DESKTOP}" \
           BUILD_MINIMAL="${BUILD_MINIMAL}" \
           DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
           DESKTOP_APPGROUPS_SELECTED="${DESKTOP_APPGROUPS_SELECTED}" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="${DESKTOP_ENVIRONMENT_CONFIG_NAME}" \
-          COMPRESS_OUTPUTIMAGE="sha,img,gz" \
           SHARE_LOG="yes" \
+          BETA="yes" \
           EXPERT="yes"
           # ENABLE_EXTENSIONS="${{ inputs.armbian_extensions }}" \
 
