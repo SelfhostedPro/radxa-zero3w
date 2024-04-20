@@ -30,7 +30,7 @@ jobs:
           - server
           - xfce
         kernel:
-          - legacy
+          # - legacy
           - vendor
     name: "Base: ${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}"
     runs-on: ubuntu-latest
