@@ -122,9 +122,8 @@ jobs:
         with:
           name: "armbian-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
           path: |
-            build/output/images/*.txt
-            build/output/images/*.xz
-            build/output/images/*.xz.sha
+            build/output/images/*
+            !build/output/images/*.img
       - name: Build Diet PI
         shell: bash
         run: |
