@@ -23,15 +23,6 @@ env:
   BUILD_DIETPI: true
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get current date
-        id: date
-        run: echo "DATE=(date +'%y.%m.%d')" >> "$GITHUB_OUTPUT"
-    outputs:
-      date: ${{ steps.date.outputs.DATE }}
-
   build-armbian:
     continue-on-error: true
     # Create a matrix of all the types of images that we want to build.
@@ -151,8 +142,12 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    needs: build-armbian
+    needs: [build-armbian]
     steps:
+      - name: Get current date
+        id: date
+        run: echo "DATE=(date +'%y.%m.%d')" >> $GITHUB_ENV
+
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
         with:
@@ -163,8 +158,8 @@ jobs:
         run: echo "${{ toJson(needs.build-armbian.outputs.armbian-artifacts) }}"
       - uses: ncipollo/release-action@v1
         with:
-          tag: "${{ needs.setup.outputs.date }}"
-          name: "${{ needs.setup.outputs.date }} Radxa Images"
+          tag: "${{ env.DATE }}"
+          name: "${{ env.DATE }} Radxa Images"
           artifacts: "./"
           allowUpdates: true
           removeArtifacts: false
