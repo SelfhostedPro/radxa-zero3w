@@ -127,7 +127,7 @@ jobs:
 
       - name: Decompress Image
         run: |
-          unxz -k build/output/images/*.xz
+          sudo unxz -k build/output/images/*.xz
 
         # Upload Armbian images to artifacts (we'll download them and add them to the release later).
       - name: Upload Armbian Artifacts for Release
