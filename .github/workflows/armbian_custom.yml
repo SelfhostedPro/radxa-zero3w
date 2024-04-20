@@ -109,7 +109,7 @@ jobs:
           BRANCH="${{ matrix.kernel }}" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_CONFIGURE="no" \
-          COMPRESS_OUTPUTIMAGE="sha,img" \
+          COMPRESS_OUTPUTIMAGE="sha,img,xz,gz" \
           BUILD_DESKTOP="${BUILD_DESKTOP}" \
           BUILD_MINIMAL="${BUILD_MINIMAL}" \
           DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
@@ -123,6 +123,7 @@ jobs:
       - name: Get file names
         run: |
           ls -R build/output/images/
+
       - name: Compress Images
         run: |
           pigz -k -9 build/output/images/*.img
@@ -164,8 +165,6 @@ jobs:
           merge-multiple: true
       - name: Display structure of downloaded files
         run: ls -R
-      - name: Display Artifact Listing
-        run: echo "${{ toJson(needs.build-armbian.outputs.armbian-artifacts) }}"
       - uses: ncipollo/release-action@v1
         with:
           tag: "${{ env.DATE }}"
