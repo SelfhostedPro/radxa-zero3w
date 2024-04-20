@@ -119,7 +119,7 @@ jobs:
           BETA="yes" \
           EXPERT="yes"
           # ENABLE_EXTENSIONS="${{ inputs.armbian_extensions }}" \
-          
+
       - name: Get file names
         run: |
           ls -R build/output/images/
@@ -169,7 +169,7 @@ jobs:
         with:
           tag: "${{ env.DATE }}"
           name: "${{ env.DATE }} Radxa Images"
-          artifacts: "./*.txt,./*.xz,./*.sha"
+          artifacts: "./*.txt,./*.gz,./*.sha"
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
