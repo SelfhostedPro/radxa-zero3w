@@ -14,6 +14,7 @@ concurrency:
 permissions:
   contents: read
   packages: write
+
 jobs:
   build-armbian:
     continue-on-error: true
@@ -30,7 +31,7 @@ jobs:
         kernel:
           - legacy
           - vendor
-    name: Build - ${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}
+    name: "Base: ${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}"
     runs-on: ubuntu-latest
     steps:
       - name: Get current date
@@ -120,6 +121,8 @@ jobs:
           name: "${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
           path: |
             build/output/images/
+    outputs:
+      artifacts: ${{ steps.artifacts.outputs.artifact-id }}
 
   release:
     runs-on: ubuntu-latest
@@ -131,6 +134,8 @@ jobs:
           merge-multiple: true
       - name: Display structure of downloaded files
         run: ls -R
+      - name: Display Artifact Listing
+        run: echo "${{ toJson(needs.build-armbian.outputs) }}"
       - uses: ncipollo/release-action@v1
         with:
           tag: "${{ env.ARMBIAN_VERSION }}"
