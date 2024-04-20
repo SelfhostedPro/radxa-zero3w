@@ -122,10 +122,11 @@ jobs:
           DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
           DESKTOP_APPGROUPS_SELECTED="${DESKTOP_APPGROUPS_SELECTED}" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="${DESKTOP_ENVIRONMENT_CONFIG_NAME}" \
-          # ENABLE_EXTENSIONS="${{ inputs.armbian_extensions }}" \
-          COMPRESS_OUTPUTIMAGE="sha,img,xz" \
+          COMPRESS_OUTPUTIMAGE="sha,img,gz" \
           SHARE_LOG="yes" \
           EXPERT="yes"
+          # ENABLE_EXTENSIONS="${{ inputs.armbian_extensions }}" \
+
       - name: Get file names
         run: |
           ls -R build/output/images/
