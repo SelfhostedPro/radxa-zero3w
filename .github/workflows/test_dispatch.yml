@@ -2,7 +2,7 @@ name: Test Armbian dispatch
 
 on:
   repository_dispatch:
-    types: ["armbian"]
+    types: ["armbian", "custom"]
 
 jobs:
   show-dispatch:
