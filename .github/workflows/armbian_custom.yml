@@ -106,6 +106,7 @@ jobs:
           ./compile.sh "build" \
           REVISION="${{ env.ARMBIAN_VERSION }}" \
           BOARD="radxa-zero3" \
+          IMAGE_PARTITION_TABLE="mbr" \
           BRANCH="${{ matrix.kernel }}" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_CONFIGURE="no" \
