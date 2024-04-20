@@ -131,6 +131,7 @@ jobs:
 
     outputs:
       armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
+      date: ${{ steps.date.output.DATE }}
 
   release:
     runs-on: ubuntu-latest
@@ -146,7 +147,7 @@ jobs:
         run: echo "${{ toJson(needs.build-armbian.outputs.armbian-artifacts) }}"
       - uses: ncipollo/release-action@v1
         with:
-          tag: "${{ env.ARMBIAN_VERSION }}"
+          tag: "${{ needs.build-armbian.outputs.date }}"
           name: "${{ steps.date.output.DATE }} Radxa Images"
           artifacts: "./"
           allowUpdates: true
