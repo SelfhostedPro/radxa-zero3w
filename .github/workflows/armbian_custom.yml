@@ -80,6 +80,7 @@ jobs:
           [[ -d custom/userpatches ]] && rsync -av custom/userpatches/. build/userpatches/
 
       - name: Compile Armbian ${{ matrix.release }}-${{ matrix.kernel }}
+        id: compile
         shell: bash
         run: |
 
@@ -106,7 +107,6 @@ jobs:
           ./compile.sh "build" \
           REVISION="${{ env.ARMBIAN_VERSION }}" \
           BOARD="radxa-zero3" \
-          IMAGE_PARTITION_TABLE="msdos" \
           BRANCH="${{ matrix.kernel }}" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_CONFIGURE="no" \
@@ -150,7 +150,7 @@ jobs:
           OUTPUT_IMG_NAME: DietPi_RadxaZero3-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
           OUTPUT_IMG_EXT: img
         run: |
-          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager')" -i build/output/images/*.img --add-dos-part
+          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/imager/.build/images/dietpi-imager')" -i build/output/images/*.img --add-dos-part
     outputs:
       armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
 
