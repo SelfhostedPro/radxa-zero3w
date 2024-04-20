@@ -17,6 +17,14 @@ permissions:
   packages: write
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get current date
+        id: date
+        run: echo "DATE=(date +'%y.%m.%d')" >> "$GITHUB_OUTPUT"
+    outputs:
+      date: ${{steps.date.output.DATE}}
   build-armbian:
     continue-on-error: true
     strategy:
@@ -32,13 +40,10 @@ jobs:
         kernel:
           # - legacy
           - vendor
+
     name: "${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}"
     runs-on: ubuntu-latest
     steps:
-      - name: Get current date
-        id: date
-        run: echo "DATE=(date +'%y.%m.%d')" >> "$GITHUB_OUTPUT"
-
       - name: "Checkout Armbian os"
         uses: actions/checkout@v4
         with:
@@ -156,8 +161,8 @@ jobs:
         env:
           RELEASE_TAG: "${{ needs.build-armbian.outputs.armbian-version }}"
         with:
-          tag: "${{ env.RELEASE_TAG }}"
-          name: "${{ steps.date.output.DATE }} Radxa Images"
+          tag: "${{ needs.setup.output.date }}"
+          name: "${{ needs.setup.output.date }} Radxa Images"
           artifacts: "./"
           allowUpdates: true
           removeArtifacts: false
