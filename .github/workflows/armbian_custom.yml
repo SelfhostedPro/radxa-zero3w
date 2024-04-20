@@ -1,5 +1,5 @@
 name: "Build Custom Armbian Images"
-run-name: "Building Custom Armbian Images"
+run-name: "Building ${{ github.ref_name }} Custom Armbian Images v${{ github.run_number }}"
 on:
   workflow_dispatch:
   repository_dispatch:
