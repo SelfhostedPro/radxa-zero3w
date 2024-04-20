@@ -7,7 +7,8 @@ on:
 
 # Ensure there is only one instance of job running
 concurrency:
-  group: ${{ github.run_id }}-custom
+  # group: ${{ github.run_id }}-custom
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 # Allow writing packages
