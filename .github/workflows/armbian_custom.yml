@@ -15,6 +15,7 @@ permissions:
   packages: write
 jobs:
   build-armbian:
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -30,7 +31,6 @@ jobs:
           - vendor
     name: Build - ${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}
     runs-on: ubuntu-latest
-
     steps:
       - name: Get current date
         id: date
@@ -111,6 +111,38 @@ jobs:
           COMPRESS_OUTPUTIMAGE="sha,xz" \
           SHARE_LOG="yes" \
           EXPERT="yes"
+
+      - name: Archive production artifacts
+        id: artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
+          path: |
+            build/output/images/*.gz
+
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Display structure of downloaded files
+        run: ls -R
+      - uses: ncipollo/release-action@v1
+        with:
+          tag: "${{ env.ARMBIAN_VERSION }}"
+          name: "${{ steps.date.output.DATE }} Radxa Images"
+          artifacts: "./"
+          allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
+          makeLatest: true
+          token: "${{ secrets.ARMBIAN_SELF_DISPATCH_TOKEN }}"
+          body: |
+            Radxa Custom Images:
+            {{  }}
 
       # - uses: armbian/build@main
       #   with:
