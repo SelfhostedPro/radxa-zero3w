@@ -126,7 +126,9 @@ jobs:
           COMPRESS_OUTPUTIMAGE="sha,img,xz" \
           SHARE_LOG="yes" \
           EXPERT="yes"
-
+      - name: Get file names
+        run: |
+          ls -R build/output/images/
       - name: Upload Artifacts for Release
         id: artifacts
         uses: actions/upload-artifact@v4
