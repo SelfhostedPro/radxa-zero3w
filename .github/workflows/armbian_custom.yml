@@ -126,7 +126,7 @@ jobs:
       - name: Compress Images
         run: |
           pigz -k -9 build/output/images/*.img
-          
+
         # Upload Armbian images to artifacts (we'll download them and add them to the release later).
       - name: Upload Armbian Artifacts for Release
         id: artifacts
@@ -146,7 +146,7 @@ jobs:
           OUTPUT_IMG_NAME: DietPi_RadxaZero3-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
           OUTPUT_IMG_EXT: img
         run: |
-          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager')" -i ./*.img --add-dos-part
+          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager')" -i build/output/images/*.img --add-dos-part
     outputs:
       armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
 
