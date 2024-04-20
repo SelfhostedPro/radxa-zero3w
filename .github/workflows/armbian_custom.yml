@@ -16,7 +16,6 @@ permissions:
   contents: read
   packages: write
 
-
 env:
   # Force specific version of armbian
   ARMBIAN_VERSION: 24.5.0-trunk.434
@@ -29,9 +28,9 @@ jobs:
     steps:
       - name: Get current date
         id: date
-        run: echo "DATE=(date +'%y.%m.%d')" >> $GITHUB_OUTPUT
+        run: echo "DATE=(date +'%y.%m.%d')" >> "$GITHUB_OUTPUT"
     outputs:
-      date: ${{steps.date.output.DATE}}
+      date: ${{ steps.date.outputs.DATE }}
 
   build-armbian:
     continue-on-error: true
@@ -163,11 +162,9 @@ jobs:
       - name: Display Artifact Listing
         run: echo "${{ toJson(needs.build-armbian.outputs.armbian-artifacts) }}"
       - uses: ncipollo/release-action@v1
-        env:
-          RELEASE_TAG: "${{ needs.build-armbian.outputs.armbian-version }}"
         with:
-          tag: "${{ needs.setup.output.date }}"
-          name: "${{ needs.setup.output.date }} Radxa Images"
+          tag: "${{ needs.setup.outputs.date }}"
+          name: "${{ needs.setup.outputs.date }} Radxa Images"
           artifacts: "./"
           allowUpdates: true
           removeArtifacts: false
