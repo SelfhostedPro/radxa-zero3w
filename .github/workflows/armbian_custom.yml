@@ -111,7 +111,7 @@ jobs:
           DESKTOP_APPGROUPS_SELECTED="${DESKTOP_APPGROUPS_SELECTED}" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="${DESKTOP_ENVIRONMENT_CONFIG_NAME}" \
           # ENABLE_EXTENSIONS="${{ inputs.armbian_extensions }}" \
-          COMPRESS_OUTPUTIMAGE="sha,xz" \
+          COMPRESS_OUTPUTIMAGE="sha,img,xz" \
           SHARE_LOG="yes" \
           EXPERT="yes"
 
@@ -119,11 +119,17 @@ jobs:
         id: artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
+          name: "armbian-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
           path: |
-            build/output/images/
+            build/output/images/*.txt
+            build/output/images/*.xz
+            build/output/images/*.xz.sha
+      - name: Build Diet PI
+        shell: bash
+        run: |
+          sudo bash -c "$(curl -sSf https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager)" 'DietPi-Build' --add-dos-part SOURCE_TYPE='Image' FP_SOURCE_IMG=./build/output/images/*.img
     outputs:
-      artifacts: ${{ steps.artifacts.outputs.artifact-id }}
+      armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
 
   release:
     runs-on: ubuntu-latest
@@ -136,7 +142,7 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
       - name: Display Artifact Listing
-        run: echo "${{ toJson(needs.build-armbian.outputs) }}"
+        run: echo "${{ toJson(needs.build-armbian.outputs.armbian-artifacts) }}"
       - uses: ncipollo/release-action@v1
         with:
           tag: "${{ env.ARMBIAN_VERSION }}"
