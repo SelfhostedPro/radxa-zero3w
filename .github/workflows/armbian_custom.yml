@@ -16,9 +16,12 @@ permissions:
   contents: read
   packages: write
 
-# Force specific version of armbian
+
 env:
+  # Force specific version of armbian
   ARMBIAN_VERSION: 24.5.0-trunk.434
+  # Enable or disable building dietpi
+  BUILD_DIETPI: true
 
 jobs:
   setup:
@@ -26,11 +29,13 @@ jobs:
     steps:
       - name: Get current date
         id: date
-        run: echo "DATE=(date +'%y.%m.%d')" >> "$GITHUB_OUTPUT"
+        run: echo "DATE=(date +'%y.%m.%d')" >> $GITHUB_OUTPUT
     outputs:
       date: ${{steps.date.output.DATE}}
+
   build-armbian:
     continue-on-error: true
+    # Create a matrix of all the types of images that we want to build.
     strategy:
       fail-fast: false
       matrix:
@@ -64,7 +69,8 @@ jobs:
           clean: false
           path: build
 
-      - name: "Checkout customisations"
+        # Checkout armbian branch of this repo (keeping separated for easier identification of modifications).
+      - name: "Checkout Armbian branch customisations"
         uses: actions/checkout@v4
         with:
           ref: "armbian"
@@ -76,7 +82,9 @@ jobs:
         shell: bash
         id: customisation
         run: |
-          # copy os userpatches and custom
+
+          # copy os userpatches (from armbian repo) and
+          # copy custom user patches (from armbian branch of this repo)
           mkdir -pv build/userpatches
           rsync -av os/userpatches/. build/userpatches/
           [[ -d custom/userpatches ]] && rsync -av custom/userpatches/. build/userpatches/
@@ -85,7 +93,7 @@ jobs:
         shell: bash
         run: |
 
-          # userspace decode
+          # Get kind of ui
           if [[ "${{ matrix.ui }}" == minimal ]]; then
             BUILD_DESKTOP="no"
             BUILD_MINIMAL="yes"
@@ -125,6 +133,8 @@ jobs:
       - name: Get file names
         run: |
           ls -R build/output/images/
+
+        # Upload Armbian images to artifacts (we'll download them and add them to the release later).
       - name: Upload Artifacts for Release
         id: artifacts
         uses: actions/upload-artifact@v4
@@ -137,7 +147,6 @@ jobs:
         shell: bash
         run: |
           sudo G_GITOWNER='MichaIng' G_GITBRANCH='master' SOURCE_TYPE='Image' FP_SOURCE_IMG='./build/output/images/*.img' CLONING_TOOL='dd' bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager')" 'DietPi-Build' --add-dos-part
-
     outputs:
       armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
 
