@@ -127,14 +127,7 @@ jobs:
       - name: Build Diet PI
         shell: bash
         run: |
-          sudo bash -c "\
-          G_GITOWNER='MichaIng' \ 
-          G_GITBRANCH='master' \
-          FP_SOURCE_IMG=./build/output/images/*.img \
-          SOURCE_TYPE='Drive' \
-          $(curl -sSf https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager)" \ 
-          'DietPi-Build' \
-          --add-dos-part \
+          sudo bash -c "G_GITOWNER='MichaIng' G_GITBRANCH='master' SOURCE_TYPE='Image' FP_SOURCE_IMG=./build/output/images/*.img $(curl -sSf https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-imager)" 'DietPi-Build' --add-dos-part
 
     outputs:
       armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
