@@ -76,7 +76,8 @@ jobs:
           rsync -av os/userpatches/. build/userpatches/
           [[ -d custom/userpatches ]] && rsync -av custom/userpatches/. build/userpatches/
 
-      - shell: bash
+      - name: Compile Armbian {{ matrix.release }}-{{ matrix.kernel }}
+        shell: bash
         run: |
 
           # userspace decode
