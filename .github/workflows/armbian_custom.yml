@@ -109,7 +109,7 @@ jobs:
           BRANCH="${{ matrix.kernel }}" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_CONFIGURE="no" \
-          COMPRESS_OUTPUTIMAGE="sha,img,xz" \
+          COMPRESS_OUTPUTIMAGE="sha,img" \
           BUILD_DESKTOP="${BUILD_DESKTOP}" \
           BUILD_MINIMAL="${BUILD_MINIMAL}" \
           DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
@@ -119,13 +119,15 @@ jobs:
           BETA="yes" \
           EXPERT="yes"
           # ENABLE_EXTENSIONS="${{ inputs.armbian_extensions }}" \
-
+          
       - name: Get file names
         run: |
           ls -R build/output/images/
-
+      - name: Compress Images
+        run: |
+          pigz -k -9 ./*.img
         # Upload Armbian images to artifacts (we'll download them and add them to the release later).
-      - name: Upload Artifacts for Release
+      - name: Upload Armbian Artifacts for Release
         id: artifacts
         uses: actions/upload-artifact@v4
         with:
