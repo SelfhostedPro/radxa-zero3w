@@ -129,6 +129,10 @@ jobs:
         run: |
           sudo unxz -k build/output/images/*.xz
 
+      - name: List all outputs
+        run: |
+          ls -R build/output/images/
+
         # Upload Armbian images to artifacts (we'll download them and add them to the release later).
       - name: Upload Armbian Artifacts for Release
         id: artifacts
@@ -140,7 +144,6 @@ jobs:
             !build/output/images/*.img
 
       - name: Build Diet PI
-        if: env.BUILD_DIETPI == true
         shell: bash
         env:
           G_GITOWNER: MichaIng
