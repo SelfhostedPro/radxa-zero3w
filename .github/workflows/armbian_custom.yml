@@ -154,8 +154,9 @@ jobs:
           CLONING_TOOL: dd
           OUTPUT_IMG_NAME: DietPi_RadxaZero3-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
           OUTPUT_IMG_EXT: img
+          ADD_DOS_PART: 1
         run: |
-          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/imager/.build/images/dietpi-imager')" -i build/output/images/*.img --add-dos-part
+          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/imager/.build/images/dietpi-imager')" -i build/output/images/*.img
     outputs:
       armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
 
