@@ -149,7 +149,7 @@ jobs:
         shell: bash
         env:
           G_GITOWNER: MichaIng
-          G_GITBRANCH: master
+          G_GITBRANCH: imager
           FP_ROOT_DEV: /dev/loop0p2
           CLONING_TOOL: dd
           OUTPUT_IMG_NAME: DietPi_RadxaZero3-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
