@@ -1,9 +1,10 @@
 name: "Build Custom Armbian Images"
 run-name: "Building ${{ github.ref_name }} Custom Armbian Images #${{ github.run_number }}"
 on:
-  workflow_dispatch:
-  repository_dispatch:
-    types: ["custom"]
+  push:
+  # workflow_dispatch:
+  # repository_dispatch:
+  #   types: ["custom"]
 
 # Ensure there is only one instance of job running
 concurrency:
