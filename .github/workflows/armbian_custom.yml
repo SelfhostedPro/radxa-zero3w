@@ -81,9 +81,9 @@ jobs:
           echo "${{ steps.matrix.outputs.ui_type }}"
           echo "${{ steps.matrix.outputs.kernels }}"
     outputs:
-      releases: ${{ fromJson(steps.matrix.outputs.releases) }}
-      uis: ${{ fromJson(steps.matrix.outputs.ui_type) }}
-      kernels: ${{ fromJson(steps.matrix.outputs.kernels) }}
+      releases: ${{ toJson(steps.matrix.outputs.releases) }}
+      uis: ${{ toJson(steps.matrix.outputs.ui_type) }}
+      kernels: ${{ toJson(steps.matrix.outputs.kernels) }}
 
   build-armbian:
     continue-on-error: true
