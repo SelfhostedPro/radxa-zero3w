@@ -129,7 +129,7 @@ jobs:
 
         # Upload Armbian images to artifacts (we'll download them and add them to the release later).
       - name: Upload Armbian Artifacts for Release
-        id: artifacts
+        id: armbian_artifacts
         uses: actions/upload-artifact@v4
         with:
           name: "armbian-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
@@ -169,7 +169,7 @@ jobs:
 
         # Upload Armbian images to artifacts (we'll download them and add them to the release later).
       - name: Upload DietPi Artifacts for Release
-        id: artifacts
+        id: dietpi_artifacts
         uses: actions/upload-artifact@v4
         with:
           name: "dietpi-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
@@ -178,7 +178,8 @@ jobs:
             ./DietPi*.sha256
 
     outputs:
-      armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
+      armbian-artifacts: ${{ steps.armbian_artifacts.outputs.artifact-id }}
+      dietpi-artifacts: ${{ steps.dietpi_artifacts.outputs.artifact-id }}
 
 
   release:
