@@ -179,7 +179,7 @@ jobs:
         id: armbian_artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "armbian-${{ board }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
+          name: "armbian-${{ inputs.board || 'radxa-zero3' }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
           path: |
             build/output/images/*
             !build/output/images/*.img
