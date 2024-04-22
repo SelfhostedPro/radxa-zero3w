@@ -81,9 +81,9 @@ jobs:
           echo "${{ steps.matrix.outputs.ui_type }}"
           echo "${{ steps.matrix.outputs.kernels }}"
     outputs:
-      releases: ${{ toJson(steps.matrix.outputs.releases) }}
-      uis: ${{ toJson(steps.matrix.outputs.ui_type) }}
-      kernels: ${{ toJson(steps.matrix.outputs.kernels) }}
+      releases: ${{ steps.matrix.outputs.releases }}
+      uis: ${{ steps.matrix.outputs.ui_type }}
+      kernels: ${{ steps.matrix.outputs.kernels }}
 
   build-armbian:
     continue-on-error: true
@@ -91,9 +91,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release: ${{ needs.setup.outputs.releases }}
-        ui: ${{ needs.setup.outputs.uis }}
-        kernel: ${{ needs.setup.outputs.kernels }}
+        release: ${{ fromJson(needs.setup.outputs.releases) }}
+        ui: ${{ fromJson(needs.setup.outputs.uis) }}
+        kernel: ${{ fromJson(needs.setup.outputs.kernels) }}
 
     name: "${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}"
     runs-on: ubuntu-latest
