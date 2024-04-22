@@ -200,7 +200,7 @@ jobs:
         with:
           tag: "${{ env.DATE }}"
           name: "${{ env.DATE }} Radxa Images"
-          artifacts: "./*.txt,./*.xz,./*.sha"
+          artifacts: "./*.txt,./*.xz,./*.sha,./*.sha256"
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
