@@ -3,9 +3,51 @@ run-name: "Building ${{ github.ref_name }} Custom Armbian Images #${{ github.run
 on:
   push:
   workflow_dispatch:
-  # workflow_dispatch:
-  # repository_dispatch:
-  #   types: ["custom"]
+    inputs:
+      debian_releases:
+        description: comma separated list of debian releases to build
+        default: bookworm,trixie
+        required: false
+        type: string
+      kernel_versions:
+        description: Comma separated list of Kernel versions to use (vendor, current, legacy)
+        default: vendor,legacy
+        required: false
+        type: string
+      ui_type:
+        description: Type of image to build (minimal,server,xfce,etc)
+        default: minimal,server,xfce
+        required: false
+        type: string
+      release:
+        description: Make a release?
+        required: false
+        default: true
+        type: boolean
+      board:
+        description: Board to build for
+        required: false
+        default: radxa-zero3
+        type: string
+      armbian_version:
+        description: Armbian Version
+        default: 24.5.0-trunk.434
+        required: false
+        type: string
+      build_dietpi:
+        description: Build DietPi?
+        required: false
+        default: true
+        type: boolean
+      dietpi-owner:
+        description: DietPi Repo Owner
+        default: MichaIng
+        required: false
+      dietpi-branch:
+        description: DietPi Repo Branch
+        default: imager
+        type: string
+        required: false
 
 # Ensure there is only one instance of job running
 concurrency:
@@ -18,29 +60,31 @@ permissions:
   contents: read
   packages: write
 
-env:
-  # Force specific version of armbian
-  ARMBIAN_VERSION: 24.5.0-trunk.434
-  # Enable or disable building dietpi
-  BUILD_DIETPI: 'true'
-
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    steps:
+      - name: Create Matrix
+        id: matrix
+        run: |
+          echo "kernels=$(jq 'split(",")' -Rc <(echo '${{ inputs.kernel_versions || 'vendor' }}'))" >> $GITHUB_OUTPUT
+          echo "ui_type=$(jq 'split(",")' -Rc <(echo '${{ inputs.ui_type || 'minimal' }}'))" >> $GITHUB_OUTPUT
+          echo "releases=$(jq 'split(",")' -Rc <(echo '${{ inputs.debian_releases || 'bookworm' }}'))" >> $GITHUB_OUTPUT
+    outputs:
+      releases: ${{ toJson(steps.matrix.outputs.releases) }}
+      uis: ${{ toJson(steps.matrix.outputs.ui_type) }}
+      kernels: ${{ toJson(steps.matrix.outputs.kernels) }}
+
   build-armbian:
     continue-on-error: true
     # Create a matrix of all the types of images that we want to build.
     strategy:
       fail-fast: false
       matrix:
-        release:
-          # - trixie
-          - bookworm
-        ui:
-          # - minimal
-          - server
-          # - xfce
-        kernel:
-          # - legacy
-          - vendor
+        release: ${{ needs.setup.outputs.releases }}
+        ui: ${{ needs.setup.outputs.uis }}
+        kernel: ${{ needs.setup.outputs.kernels }}
 
     name: "${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}"
     runs-on: ubuntu-latest
@@ -107,8 +151,8 @@ jobs:
 
           # execute build command
           ./compile.sh "build" \
-          REVISION="${{ env.ARMBIAN_VERSION }}" \
-          BOARD="radxa-zero3" \
+          REVISION="${{ inputs.armbian_version }}" \
+          BOARD="${{ inputs.board }}" \
           BRANCH="${{ matrix.kernel }}" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_CONFIGURE="no" \
@@ -132,47 +176,46 @@ jobs:
         id: armbian_artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "armbian-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
+          name: "armbian-${{ board }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
           path: |
             build/output/images/*
             !build/output/images/*.img
 
       - name: Decompress Image
-        if: ${{ env.BUILD_DIETPI == 'true' }}
+        if: ${{ inputs.build_dietpi == true }}
         run: |
           sudo unxz -k build/output/images/*.xz
 
       - name: List all outputs
-        if: ${{ env.BUILD_DIETPI == 'true' }}
+        if: ${{ inputs.build_dietpi == true }}
         run: |
           ls -R build/output/images/
 
       - name: Build Diet PI
-        if: ${{ env.BUILD_DIETPI == 'true' }}
+        if: ${{ inputs.build_dietpi == true }}
         shell: bash
         env:
-          G_GITOWNER: MichaIng
-          G_GITBRANCH: imager
+          G_GITOWNER: ${{ inputs.dietpi_owner }}
+          G_GITBRANCH: ${{ inputs.dietpi_branch }}
           FP_ROOT_DEV: /dev/loop0p2
           CLONING_TOOL: dd
-          OUTPUT_IMG_NAME: DietPi_RadxaZero3-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
+          OUTPUT_IMG_NAME: DietPi_${{ board }}-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
           OUTPUT_IMG_EXT: img
           #ADD_DOS_PART: 1
           #CONFIGS_TO_BOOT: 1
         run: |
-          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/imager/.build/images/dietpi-imager')" -i build/output/images/*.img
+          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/${{ inputs.dietpi_owner }}/DietPi/${{ inputs.dietpi_branch }}/.build/images/dietpi-imager')" -i build/output/images/*.img
 
-      - name: List all outputs
-        if: ${{ env.BUILD_DIETPI == 'true' }}
-        run: |
-          ls -R .
-
+      # - name: List all outputs
+      #   if: ${{ env.BUILD_DIETPI == 'true' }}
+      #   run: |
+      #     ls -R .
         # Upload Armbian images to artifacts (we'll download them and add them to the release later).
       - name: Upload DietPi Artifacts for Release
         id: dietpi_artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "dietpi-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
+          name: "dietpi-${{ inputs.board }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
           path: |
             ./DietPi*.xz
             ./DietPi*.sha256
@@ -180,7 +223,6 @@ jobs:
     outputs:
       armbian-artifacts: ${{ steps.armbian_artifacts.outputs.artifact-id }}
       dietpi-artifacts: ${{ steps.dietpi_artifacts.outputs.artifact-id }}
-
 
   release:
     runs-on: ubuntu-latest
@@ -208,17 +250,4 @@ jobs:
           token: "${{ secrets.ARMBIAN_SELF_DISPATCH_TOKEN }}"
           body: |
             Radxa Custom Images:
-            based on Armbian v${{ env.ARMBIAN_VERSION }}
-
-      # - uses: armbian/build@main
-      #   with:
-      #     armbian_token: "${{ secrets.GITHUB_TOKEN }}" # GitHub token
-      #     armbian_release: "${{ matrix.release }}"
-      #     armbian_target: "build"
-      #     armbian_board: "radxa-zero3"
-      #     armbian_ui: "${{ matrix.ui }}"
-      #     armbian_kernel_branch: "${{ matrix.kernel }}"
-      #     armbian_compress: "sha,xz"
-      #     armbian_artifacts: "build/output/images/"
-      #     armbian_release_tittle: "${{ steps.date.output.DATE }} Radxa Zero 3 W Images"
-      #     armbian_release_body: "Build with [Armbian tools](https://github.com/armbian/build)"
+            based on Armbian v${{ inputs.armbian_version }}
