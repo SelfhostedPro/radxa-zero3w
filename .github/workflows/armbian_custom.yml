@@ -138,17 +138,17 @@ jobs:
             !build/output/images/*.img
 
       - name: Decompress Image
-        if: env.BUILD_DIETPI == "true"
+        if: env.BUILD_DIETPI == true
         run: |
           sudo unxz -k build/output/images/*.xz
 
       - name: List all outputs
-        if: env.BUILD_DIETPI == "true"
+        if: env.BUILD_DIETPI == true
         run: |
           ls -R build/output/images/
 
       - name: Build Diet PI
-        if: env.BUILD_DIETPI == "true"
+        if: env.BUILD_DIETPI == true
         shell: bash
         env:
           G_GITOWNER: MichaIng
