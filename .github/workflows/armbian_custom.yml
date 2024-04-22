@@ -71,9 +71,9 @@ jobs:
       - name: Create Matrix
         id: matrix
         run: |
-          echo "kernels=$(jq 'split(",")' -Rc <(echo '${{ inputs.kernel_versions || '"vendor"' }}'))" >> $GITHUB_OUTPUT
-          echo "ui_type=$(jq 'split(",")' -Rc <(echo '${{ inputs.ui_type || '"minimal"' }}'))" >> $GITHUB_OUTPUT
-          echo "releases=$(jq 'split(",")' -Rc <(echo '${{ inputs.debian_releases || '"bookworm"' }}'))" >> $GITHUB_OUTPUT
+          echo "kernels=$(jq 'split(",")' -Rc <(echo '${{ inputs.kernel_versions || 'vendor' }}'))" >> $GITHUB_OUTPUT
+          echo "ui_type=$(jq 'split(",")' -Rc <(echo '${{ inputs.ui_type || 'minimal' }}'))" >> $GITHUB_OUTPUT
+          echo "releases=$(jq 'split(",")' -Rc <(echo '${{ inputs.debian_releases || 'bookworm' }}'))" >> $GITHUB_OUTPUT
       - name: Check Matrix
         id: check
         run: |
