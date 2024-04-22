@@ -49,6 +49,9 @@ on:
         type: string
         required: false
 
+env:
+  BUILD_DIETPI: true
+
 # Ensure there is only one instance of job running
 concurrency:
   # group: ${{ github.run_id }}-custom
@@ -151,8 +154,8 @@ jobs:
 
           # execute build command
           ./compile.sh "build" \
-          REVISION="${{ inputs.armbian_version }}" \
-          BOARD="${{ inputs.board }}" \
+          REVISION="${{ inputs.armbian_version || '24.5.0-trunk.434' }}" \
+          BOARD="${{ inputs.board || 'radxa-zero3' }}" \
           BRANCH="${{ matrix.kernel }}" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_CONFIGURE="no" \
@@ -182,40 +185,40 @@ jobs:
             !build/output/images/*.img
 
       - name: Decompress Image
-        if: ${{ inputs.build_dietpi == true }}
+        if: ${{ inputs.build_dietpi == true || env.BUILD_DIETPI == 'true' }}
         run: |
           sudo unxz -k build/output/images/*.xz
 
       - name: List all outputs
-        if: ${{ inputs.build_dietpi == true }}
+        if: ${{ inputs.build_dietpi == true  || env.BUILD_DIETPI == 'true' }}
         run: |
           ls -R build/output/images/
 
       - name: Build Diet PI
-        if: ${{ inputs.build_dietpi == true }}
+        if: ${{ inputs.build_dietpi == true  || env.BUILD_DIETPI == 'true' }}
         shell: bash
         env:
-          G_GITOWNER: ${{ inputs.dietpi_owner }}
-          G_GITBRANCH: ${{ inputs.dietpi_branch }}
+          G_GITOWNER: ${{ inputs.dietpi_owner || 'MichaIng' }}
+          G_GITBRANCH: ${{ inputs.dietpi_branch || 'imager'}}
           FP_ROOT_DEV: /dev/loop0p2
           CLONING_TOOL: dd
-          OUTPUT_IMG_NAME: DietPi_${{ board }}-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
+          OUTPUT_IMG_NAME: DietPi_${{ inputs.board || 'radxa-zero3' }}-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
           OUTPUT_IMG_EXT: img
           #ADD_DOS_PART: 1
           #CONFIGS_TO_BOOT: 1
         run: |
-          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/${{ inputs.dietpi_owner }}/DietPi/${{ inputs.dietpi_branch }}/.build/images/dietpi-imager')" -i build/output/images/*.img
+          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/${{ inputs.dietpi_owner || 'MichaIng' }}/DietPi/${{ inputs.dietpi_branch || 'imager' }}/.build/images/dietpi-imager')" -i build/output/images/*.img
 
       # - name: List all outputs
       #   if: ${{ env.BUILD_DIETPI == 'true' }}
       #   run: |
       #     ls -R .
-        # Upload Armbian images to artifacts (we'll download them and add them to the release later).
+      # Upload Armbian images to artifacts (we'll download them and add them to the release later).
       - name: Upload DietPi Artifacts for Release
         id: dietpi_artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "dietpi-${{ inputs.board }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
+          name: "dietpi-${{ inputs.board || 'radxa-zero3' }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
           path: |
             ./DietPi*.xz
             ./DietPi*.sha256
@@ -250,4 +253,4 @@ jobs:
           token: "${{ secrets.ARMBIAN_SELF_DISPATCH_TOKEN }}"
           body: |
             Radxa Custom Images:
-            based on Armbian v${{ inputs.armbian_version }}
+            based on Armbian v${{ inputs.armbian_version || '24.5.0-trunk.434' }}
