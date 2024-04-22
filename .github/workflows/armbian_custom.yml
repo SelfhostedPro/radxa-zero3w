@@ -161,8 +161,25 @@ jobs:
           #CONFIGS_TO_BOOT: 1
         run: |
           sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/imager/.build/images/dietpi-imager')" -i build/output/images/*.img
+
+      - name: List all outputs
+        if: ${{ env.BUILD_DIETPI == 'true' }}
+        run: |
+          ls -R .
+
+        # Upload Armbian images to artifacts (we'll download them and add them to the release later).
+      - name: Upload DietPi Artifacts for Release
+        id: artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: "dietpi-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
+          path: |
+            ./DietPi*.xz
+            ./DietPi*.sha256
+
     outputs:
       armbian-artifacts: ${{ steps.artifacts.outputs.artifact-id }}
+
 
   release:
     runs-on: ubuntu-latest
