@@ -22,7 +22,7 @@ env:
   # Force specific version of armbian
   ARMBIAN_VERSION: 24.5.0-trunk.434
   # Enable or disable building dietpi
-  BUILD_DIETPI: true
+  BUILD_DIETPI: 'true'
 
 jobs:
   build-armbian:
@@ -138,17 +138,17 @@ jobs:
             !build/output/images/*.img
 
       - name: Decompress Image
-        if: env.BUILD_DIETPI == true
+        if: ${{ env.BUILD_DIETPI == 'true' }}
         run: |
           sudo unxz -k build/output/images/*.xz
 
       - name: List all outputs
-        if: env.BUILD_DIETPI == true
+        if: ${{ env.BUILD_DIETPI == 'true' }}
         run: |
           ls -R build/output/images/
 
       - name: Build Diet PI
-        if: env.BUILD_DIETPI == true
+        if: ${{ env.BUILD_DIETPI == 'true' }}
         shell: bash
         env:
           G_GITOWNER: MichaIng
