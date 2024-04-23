@@ -274,12 +274,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-armbian, setup]
     env:
-      make_release: ${{ needs.setup.inputs.make_release }}
-      armbian_version: ${{ needs.setup.inputs.armbian_version }}
-      board: ${{ needs.setup.inputs.board }}
-      build_dietpi: ${{ needs.setup.inputs.build_dietpi }}
-      dietpi_owner: ${{ needs.setup.inputs.dietpi_owner }}
-      dietpi_branch: ${{ needs.setup.inputs.dietpi_branch }}
+      make_release: ${{ needs.setup.outputs.make_release }}
+      armbian_version: ${{ needs.setup.outputs.armbian_version }}
+      board: ${{ needs.setup.outputs.board }}
+      build_dietpi: ${{ needs.setup.outputs.build_dietpi }}
+      dietpi_owner: ${{ needs.setup.outputs.dietpi_owner }}
+      dietpi_branch: ${{ needs.setup.outputs.dietpi_branch }}
     steps:
       - name: Get current date
         id: date
