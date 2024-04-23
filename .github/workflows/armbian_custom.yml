@@ -14,7 +14,7 @@ on:
         default: vendor,legacy
         required: false
         type: string
-      ui_type:
+      image_type:
         description: Type of image to build (minimal,server,xfce,etc)
         default: minimal,server,xfce
         required: false
@@ -49,9 +49,6 @@ on:
         type: string
         required: false
 
-env:
-  BUILD_DIETPI: true
-
 # Ensure there is only one instance of job running
 concurrency:
   # group: ${{ github.run_id }}-custom
@@ -72,17 +69,49 @@ jobs:
         id: matrix
         run: |
           echo "kernels=$(jq 'split(",")' -Rc <(echo '${{ inputs.kernel_versions || 'vendor' }}'))" >> $GITHUB_OUTPUT
-          echo "ui_type=$(jq 'split(",")' -Rc <(echo '${{ inputs.ui_type || 'minimal' }}'))" >> $GITHUB_OUTPUT
+          echo "image_type=$(jq 'split(",")' -Rc <(echo '${{ inputs.image_type || 'minimal' }}'))" >> $GITHUB_OUTPUT
           echo "releases=$(jq 'split(",")' -Rc <(echo '${{ inputs.debian_releases || 'bookworm' }}'))" >> $GITHUB_OUTPUT
       - name: Check Matrix
         id: check
         run: |
           echo "${{ steps.matrix.outputs.releases }}"
-          echo "${{ steps.matrix.outputs.ui_type }}"
+          echo "${{ steps.matrix.outputs.image_type }}"
           echo "${{ steps.matrix.outputs.kernels }}"
+      - name: Get Inputs or Set Defaults
+        id: inputs
+        run: |
+          echo "Make a release? ${{ inputs.release || true }}"
+          echo "make_release=${{ inputs.release || true }}" >> $GITHUB_OUTPUT
+
+          echo "Armbian Version: ${{ inputs.armbian_version || '24.5.0-trunk.43' }}"
+          echo "armbian_version=${{ inputs.armbian_version || '24.5.0-trunk.43' }}" >> $GITHUB_OUTPUT
+
+          echo "Board: ${{ inputs.board || 'radxa-zero3' }}"
+          echo "board=${{ inputs.board || 'radxa-zero3' }}" >> $GITHUB_OUTPUT
+
+          echo "Build DietPi? ${{ inputs.build_dietpi || true }}"
+          echo "build_dietpi=${{ inputs.build_dietpi || true }}" >> $GITHUB_OUTPUT
+
+
+          echo "DietPi Owner: ${{ inputs.dietpi_owner || 'MichaIng' }}"
+          echo "dietpi_owner=${{ inputs.dietpi_owner || 'MichaIng' }}" >> $GITHUB_OUTPUT
+
+
+          echo "DietPi Branch: ${{ inputs.dietpi_branch || 'imager' }}"
+          echo "dietpi_branch=${{ inputs.dietpi_branch || 'imager' }}" >> $GITHUB_OUTPUT
+
+          echo "Building for Kernel(s): ${{ steps.matrix.outputs.kernels }}"
+          echo "Building Debian Release(s): ${{ steps.matrix.outputs.releases}}"
+          echo "Building Images(s): ${{ steps.matrix.outputs.image_type }}"
     outputs:
+      make_release: ${{ steps.inputs.make_release }}
+      armbian_version: ${{ steps.inputs.armbian_version }}
+      board: ${{ steps.inputs.board }}
+      build_dietpi: ${{ steps.inputs.build_dietpi }}
+      dietpi_owner: ${{ steps.inputs.dietpi_owner }}
+      dietpi_branch: ${{ steps.inputs.dietpi_branch }}
       releases: ${{ steps.matrix.outputs.releases }}
-      uis: ${{ steps.matrix.outputs.ui_type }}
+      uis: ${{ steps.matrix.outputs.image_type }}
       kernels: ${{ steps.matrix.outputs.kernels }}
 
   build-armbian:
@@ -96,6 +125,13 @@ jobs:
         kernel: ${{ fromJson(needs.setup.outputs.kernels) }}
 
     name: "${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}"
+    env:
+      make_release: ${{ needs.setup.inputs.make_release }}
+      armbian_version: ${{ needs.setup.inputs.armbian_version }}
+      board: ${{ needs.setup.inputs.board }}
+      build_dietpi: ${{ needs.setup.inputs.build_dietpi }}
+      dietpi_owner: ${{ needs.setup.inputs.dietpi_owner }}
+      dietpi_branch: ${{ needs.setup.inputs.dietpi_branch }}
     runs-on: ubuntu-latest
     needs: ["setup"]
     steps:
@@ -161,8 +197,8 @@ jobs:
 
           # execute build command
           ./compile.sh "build" \
-          REVISION="${{ inputs.armbian_version || '24.5.0-trunk.434' }}" \
-          BOARD="${{ inputs.board || 'radxa-zero3' }}" \
+          REVISION="${{ env.armbian_version }}" \
+          BOARD="${{ env.board }}" \
           BRANCH="${{ matrix.kernel }}" \
           RELEASE="${{ matrix.release }}" \
           KERNEL_CONFIGURE="no" \
@@ -186,35 +222,35 @@ jobs:
         id: armbian_artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "armbian-${{ inputs.board || 'radxa-zero3' }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
+          name: "armbian-${{ env.board }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
           path: |
             build/output/images/*
             !build/output/images/*.img
 
       - name: Decompress Image
-        if: ${{ inputs.build_dietpi == true || env.BUILD_DIETPI == 'true' }}
+        if: ${{ env.build_dietpi == 'true' }}
         run: |
           sudo unxz -k build/output/images/*.xz
 
       - name: List all outputs
-        if: ${{ inputs.build_dietpi == true  || env.BUILD_DIETPI == 'true' }}
+        if: ${{ env.build_dietpi == 'true' }}
         run: |
           ls -R build/output/images/
 
       - name: Build Diet PI
-        if: ${{ inputs.build_dietpi == true  || env.BUILD_DIETPI == 'true' }}
+        if: ${{ env.build_dietpi == 'true' }}
         shell: bash
         env:
-          G_GITOWNER: ${{ inputs.dietpi_owner || 'MichaIng' }}
-          G_GITBRANCH: ${{ inputs.dietpi_branch || 'imager'}}
+          G_GITOWNER: ${{ env.dietpi_owner }}
+          G_GITBRANCH: ${{ env.dietpi_branch }}
           FP_ROOT_DEV: /dev/loop0p2
           CLONING_TOOL: dd
-          OUTPUT_IMG_NAME: DietPi_${{ inputs.board || 'radxa-zero3' }}-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
+          OUTPUT_IMG_NAME: DietPi_${{ env.board }}-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
           OUTPUT_IMG_EXT: img
           #ADD_DOS_PART: 1
           #CONFIGS_TO_BOOT: 1
         run: |
-          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/${{ inputs.dietpi_owner || 'MichaIng' }}/DietPi/${{ inputs.dietpi_branch || 'imager' }}/.build/images/dietpi-imager')" -i build/output/images/*.img
+          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/${{ env.dietpi_owner }}/DietPi/${{ env.dietpi_branch }}/.build/images/dietpi-imager')" -i build/output/images/*.img
 
       # - name: List all outputs
       #   if: ${{ env.BUILD_DIETPI == 'true' }}
@@ -225,7 +261,7 @@ jobs:
         id: dietpi_artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "dietpi-${{ inputs.board || 'radxa-zero3' }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
+          name: "dietpi-${{ env.board }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
           path: |
             ./DietPi*.xz
             ./DietPi*.sha256
@@ -236,7 +272,14 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    needs: [build-armbian]
+    needs: [build-armbian, setup]
+    env:
+      make_release: ${{ needs.setup.inputs.make_release }}
+      armbian_version: ${{ needs.setup.inputs.armbian_version }}
+      board: ${{ needs.setup.inputs.board }}
+      build_dietpi: ${{ needs.setup.inputs.build_dietpi }}
+      dietpi_owner: ${{ needs.setup.inputs.dietpi_owner }}
+      dietpi_branch: ${{ needs.setup.inputs.dietpi_branch }}
     steps:
       - name: Get current date
         id: date
@@ -260,4 +303,4 @@ jobs:
           token: "${{ secrets.ARMBIAN_SELF_DISPATCH_TOKEN }}"
           body: |
             Radxa Custom Images:
-            based on Armbian v${{ inputs.armbian_version || '24.5.0-trunk.434' }}
+            based on Armbian v${{ env.armbian_version }}
