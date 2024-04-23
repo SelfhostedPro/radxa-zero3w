@@ -104,12 +104,12 @@ jobs:
           echo "Building Debian Release(s): ${{ steps.matrix.outputs.releases}}"
           echo "Building Images(s): ${{ steps.matrix.outputs.image_type }}"
     outputs:
-      make_release: ${{ steps.inputs.make_release }}
-      armbian_version: ${{ steps.inputs.armbian_version }}
-      board: ${{ steps.inputs.board }}
-      build_dietpi: ${{ steps.inputs.build_dietpi }}
-      dietpi_owner: ${{ steps.inputs.dietpi_owner }}
-      dietpi_branch: ${{ steps.inputs.dietpi_branch }}
+      make_release: ${{ steps.inputs.outputs.make_release }}
+      armbian_version: ${{ steps.inputs.outputs.armbian_version }}
+      board: ${{ steps.inputs.outputs.board }}
+      build_dietpi: ${{ steps.inputs.outputs.build_dietpi }}
+      dietpi_owner: ${{ steps.inputs.outputs.dietpi_owner }}
+      dietpi_branch: ${{ steps.inputs.outputs.dietpi_branch }}
       releases: ${{ steps.matrix.outputs.releases }}
       uis: ${{ steps.matrix.outputs.image_type }}
       kernels: ${{ steps.matrix.outputs.kernels }}
