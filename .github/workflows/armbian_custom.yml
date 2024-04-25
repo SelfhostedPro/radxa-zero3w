@@ -208,11 +208,11 @@ jobs:
           DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
           DESKTOP_APPGROUPS_SELECTED="${DESKTOP_APPGROUPS_SELECTED}" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="${DESKTOP_ENVIRONMENT_CONFIG_NAME}" \
-          BOOTFS_TYPE="fat" \
           SHARE_LOG="yes" \
           BETA="yes" \
           EXPERT="yes"
-          ENABLE_EXTENSIONS="usb-gadget-ums" \
+          BOOTFS_TYPE="fat" 
+          # ENABLE_EXTENSIONS="usb-gadget-ums" \
 # BOOTPART_REQUIRED
 # ARMBIAN_IMAGE_BUILD_BOOTFS_TYPE
 # BOOTFS_TYPE
