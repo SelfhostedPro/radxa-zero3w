@@ -211,7 +211,7 @@ jobs:
           SHARE_LOG="yes" \
           BETA="yes" \
           EXPERT="yes"
-          BOOTFS_TYPE="fat" 
+          # BOOTFS_TYPE="fat" 
           # ENABLE_EXTENSIONS="usb-gadget-ums" \
 # BOOTPART_REQUIRED
 # ARMBIAN_IMAGE_BUILD_BOOTFS_TYPE
