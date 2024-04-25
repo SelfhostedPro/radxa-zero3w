@@ -97,8 +97,8 @@ jobs:
           echo "dietpi_owner=${{ inputs.dietpi_owner || 'MichaIng' }}" >> $GITHUB_OUTPUT
 
 
-          echo "DietPi Branch: ${{ inputs.dietpi_branch || 'imager' }}"
-          echo "dietpi_branch=${{ inputs.dietpi_branch || 'imager' }}" >> $GITHUB_OUTPUT
+          echo "DietPi Branch: ${{ inputs.dietpi_branch || 'dev' }}"
+          echo "dietpi_branch=${{ inputs.dietpi_branch || 'dev' }}" >> $GITHUB_OUTPUT
 
           echo "Building for Kernel(s): ${{ steps.matrix.outputs.kernels }}"
           echo "Building Debian Release(s): ${{ steps.matrix.outputs.releases}}"
@@ -208,11 +208,14 @@ jobs:
           DESKTOP_ENVIRONMENT="${DESKTOP_ENVIRONMENT}" \
           DESKTOP_APPGROUPS_SELECTED="${DESKTOP_APPGROUPS_SELECTED}" \
           DESKTOP_ENVIRONMENT_CONFIG_NAME="${DESKTOP_ENVIRONMENT_CONFIG_NAME}" \
+          BOOTFS_TYPE="fat" \
           SHARE_LOG="yes" \
           BETA="yes" \
           EXPERT="yes"
-          # ENABLE_EXTENSIONS="${{ inputs.armbian_extensions }}" \
-
+          ENABLE_EXTENSIONS="usb-gadget-ums" \
+# BOOTPART_REQUIRED
+# ARMBIAN_IMAGE_BUILD_BOOTFS_TYPE
+# BOOTFS_TYPE
       - name: Get file names
         run: |
           ls -R build/output/images/
