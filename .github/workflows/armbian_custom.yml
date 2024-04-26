@@ -240,15 +240,6 @@ jobs:
         run: |
           ls -R build/output/images/
 
-      - name: "Checkout DietPi"
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.dietpi_owner }}/dietpi
-          ref: ${{ env.dietpi_branch }}
-          fetch-depth: 0
-          clean: false
-          path: dietpi
-
       - name: Build Diet PI
         if: ${{ env.build_dietpi == 'true' }}
         shell: bash
@@ -260,7 +251,7 @@ jobs:
           OUTPUT_IMG_NAME: DietPi_${{ env.board }}-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
           OUTPUT_IMG_EXT: img
         run: |
-          cd dietpi && sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/${{ env.dietpi_owner }}/DietPi/${{ env.dietpi_branch }}/.build/images/dietpi-imager')" -i build/output/images/*.img
+          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/${{ env.dietpi_owner }}/DietPi/${{ env.dietpi_branch }}/.build/images/dietpi-imager')" -i build/output/images/*.img
 
       # - name: List all outputs
       #   if: ${{ env.BUILD_DIETPI == 'true' }}
