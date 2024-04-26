@@ -259,7 +259,7 @@ jobs:
           G_GITOWNER: ${{ env.dietpi_owner }}
           G_GITBRANCH: ${{ env.dietpi_branch }}
         run: |
-          sudo --preserve-env bash -c "$(curl -sSf "https://raw.githubusercontent.com/${{ env.dietpi_owner }}/DietPi/${{ env.dietpi_branch }}/.build/images/dietpi-build")" -m 90 -d 8
+          sudo --preserve-env bash -c "$(curl -sSf "https://raw.githubusercontent.com/${{ env.dietpi_owner }}/DietPi/${{ env.dietpi_branch }}/.build/images/dietpi-build")" 'DietPi-Build' -m 90 -d 8
 
       - name: Upload DietPi Artifacts for Release
         id: dietpi_artifacts
