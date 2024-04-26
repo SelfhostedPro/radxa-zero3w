@@ -122,7 +122,7 @@ jobs:
       kernels: ${{ steps.matrix.outputs.kernels }}
 
   build-armbian:
-    if: ${{ env.build_armbian }}
+    if: env.build_armbian
     continue-on-error: true
     # Create a matrix of all the types of images that we want to build.
     strategy:
@@ -259,7 +259,7 @@ jobs:
           G_GITOWNER: ${{ env.dietpi-owner }}
           G_GITBRANCH: ${{ env.dietpi-branch }}
         run: |
-          sudo --preserve-env bash -c "$(curl -sSf "https://raw.githubusercontent.com/${{ env.G_GITOWNER }}/DietPi/${{ G_GITBRANCH }}/.build/images/dietpi-build") -m 90"
+          sudo --preserve-env bash -c "$(curl -sSf "https://raw.githubusercontent.com/$G_GITOWNER/DietPi/$G_GITBRANCH/.build/images/dietpi-build") -m 90"
 
       - name: Upload DietPi Artifacts for Release
         id: dietpi_artifacts
