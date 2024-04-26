@@ -277,8 +277,8 @@ jobs:
     needs: [build-armbian, build-dietpi, setup]
     if: |
       always() && 
-      ( needs.build-armbian.result == success' || needs.build-armbian.result == 'skipped' )
-      ( needs.build-dietpi.result == success' || needs.build-dietpi.result == 'skipped' )
+      ( needs.build-armbian.result == 'success' || needs.build-armbian.result == 'skipped' )
+      ( needs.build-dietpi.result == 'success' || needs.build-dietpi.result == 'skipped' )
     env:
       make_release: ${{ needs.setup.outputs.make_release }}
       armbian_version: ${{ needs.setup.outputs.armbian_version }}
