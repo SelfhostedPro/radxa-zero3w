@@ -12,7 +12,7 @@ on:
       build_armbian:
         description: Build Armbian?
         required: false
-        default: true
+        default: false
         type: boolean
       debian_releases:
         description: comma separated list of debian releases to build
@@ -97,8 +97,8 @@ jobs:
           echo "Build DietPi? ${{ inputs.build_dietpi || true }}"
           echo "build_dietpi=${{ inputs.build_dietpi || true }}" >> $GITHUB_OUTPUT
 
-          echo "Build Armbian? ${{ inputs.build_armbian || true }}"
-          echo "build_armbian=${{ inputs.build_armbian || true }}" >> $GITHUB_OUTPUT
+          echo "Build Armbian? ${{ inputs.build_armbian || false }}"
+          echo "build_armbian=${{ inputs.build_armbian || false }}" >> $GITHUB_OUTPUT
 
           echo "DietPi Owner: ${{ inputs.dietpi_owner || 'MichaIng' }}"
           echo "dietpi_owner=${{ inputs.dietpi_owner || 'MichaIng' }}" >> $GITHUB_OUTPUT
@@ -122,7 +122,7 @@ jobs:
       kernels: ${{ steps.matrix.outputs.kernels }}
 
   build-armbian:
-    if: env.build_armbian
+    if: ${{ env.build_armbian == true }}
     continue-on-error: true
     # Create a matrix of all the types of images that we want to build.
     strategy:
@@ -134,6 +134,7 @@ jobs:
 
     name: "${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}"
     env:
+      build_armbian: ${{ needs.setup.outputs.build_armbian }}
       make_release: ${{ needs.setup.outputs.make_release }}
       armbian_version: ${{ needs.setup.outputs.armbian_version }}
       board: ${{ needs.setup.outputs.board }}
