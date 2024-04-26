@@ -104,8 +104,8 @@ jobs:
           echo "dietpi_owner=${{ inputs.dietpi_owner || 'MichaIng' }}" >> $GITHUB_OUTPUT
 
 
-          echo "DietPi Branch: ${{ inputs.dietpi_branch || 'dev' }}"
-          echo "dietpi_branch=${{ inputs.dietpi_branch || 'dev' }}" >> $GITHUB_OUTPUT
+          echo "DietPi Branch: ${{ inputs.dietpi_branch || 'newimages' }}"
+          echo "dietpi_branch=${{ inputs.dietpi_branch || 'newimages' }}" >> $GITHUB_OUTPUT
 
           echo "Building for Kernel(s): ${{ steps.matrix.outputs.kernels }}"
           echo "Building Debian Release(s): ${{ steps.matrix.outputs.releases}}"
@@ -259,7 +259,7 @@ jobs:
           G_GITOWNER: ${{ env.dietpi_owner }}
           G_GITBRANCH: ${{ env.dietpi_branch }}
         run: |
-          sudo --preserve-env bash -c "$(curl -sSf "https://raw.githubusercontent.com/$G_GITOWNER/DietPi/$G_GITBRANCH/.build/images/dietpi-build")" -m 90 -d 8
+          sudo --preserve-env bash -c "$(curl -sSf "https://raw.githubusercontent.com/${{ env.dietpi_owner }}/DietPi/${{ env.dietpi_branch }}/.build/images/dietpi-build")" -m 90 -d 8
 
       - name: Upload DietPi Artifacts for Release
         id: dietpi_artifacts
