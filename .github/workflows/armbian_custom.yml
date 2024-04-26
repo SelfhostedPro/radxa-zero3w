@@ -122,7 +122,7 @@ jobs:
       kernels: ${{ steps.matrix.outputs.kernels }}
 
   build-armbian:
-    if: ${{ env.build_armbian == true }}
+    if: ${{ needs.setup.outputs.build_armbian == true }}
     continue-on-error: true
     # Create a matrix of all the types of images that we want to build.
     strategy:
