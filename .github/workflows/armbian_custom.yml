@@ -253,14 +253,13 @@ jobs:
       dietpi_owner: ${{ needs.setup.outputs.dietpi_owner }}
       dietpi_branch: ${{ needs.setup.outputs.dietpi_branch }}
     steps:
-
       - name: Build DietPi
         id: dietpi-build
         env:
-          G_GITOWNER: ${{ env.dietpi-owner }}
-          G_GITBRANCH: ${{ env.dietpi-branch }}
+          G_GITOWNER: ${{ env.dietpi_owner }}
+          G_GITBRANCH: ${{ env.dietpi_branch }}
         run: |
-          sudo --preserve-env bash -c "$(curl -sSf "https://raw.githubusercontent.com/$G_GITOWNER/DietPi/$G_GITBRANCH/.build/images/dietpi-build") -m 90"
+          sudo --preserve-env bash -c "$(curl -sSf "https://raw.githubusercontent.com/$G_GITOWNER/DietPi/$G_GITBRANCH/.build/images/dietpi-build") -m 90 -d 8"
 
       - name: Upload DietPi Artifacts for Release
         id: dietpi_artifacts
