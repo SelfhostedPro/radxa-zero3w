@@ -20,6 +20,7 @@ BUILD_DESKTOP=$4
 Main() {
     case $RELEASE in
         trixie)
+            dietpi_trixie
         ;;
         bookworm)
             fix_wifi_driver
@@ -39,6 +40,28 @@ Main() {
         ;;
     esac
 } # Main
+
+function dietpi_trixie() {
+    echo "Installing DietPi!!!"
+    sudo bash -c "G_DISTRO=8  G_DISTRO_NAME='trixie' HW_MODEL=90 G_RASPBIAN=0 GITOWNER='MichaIng' GITBRANCH='newimages' IMAGE_CREATOR='SelfhostedPro' PREIMAGE_INFO='Dietpi Armbian' WIFI_REQUIRED=1 DISTRO_TARGET=8; $(curl -sSfL 'https://raw.githubusercontent.com/MichaIng/DietPi/master/.build/images/dietpi-installer')"
+}
+
+function dietpi_bookworm() {
+    G_DISTRO=7
+    G_DISTRO_NAME='bookworm'
+    HW_MODEL=90
+    G_RASPBIAN=0
+    GITOWNER='MichaIng'
+    GITBRANCH='newimages'
+    IMAGE_CREATOR='SelfhostedPro'
+    PREIMAGE_INFO='Dietpi Armbian'
+    WIFI_REQUIRED=1
+    DISTRO_TARGET=7
+}
+
+function install_diet_pi() {
+    
+}
 
 function fix_wifi_driver() {
     temp=$(mktemp)
