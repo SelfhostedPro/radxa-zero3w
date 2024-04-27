@@ -220,15 +220,15 @@ jobs:
         run: |
           ls -R build/output/images/
 
-        # Upload Armbian images to artifacts (we'll download them and add them to the release later).
-      - name: Upload Armbian Artifacts for Release
-        id: armbian_artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: "armbian-${{ env.board }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
-          path: |
-            build/output/images/*
-            !build/output/images/*.img
+      #   # Upload Armbian images to artifacts (we'll download them and add them to the release later).
+      # - name: Upload Armbian Artifacts for Release
+      #   id: armbian_artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: "armbian-${{ env.board }}-${{ matrix.ui }}-${{ matrix.release }}-${{ matrix.kernel }}"
+      #     path: |
+      #       build/output/images/*
+      #       !build/output/images/*.img
 
       - name: Decompress Image
         if: ${{ env.build_dietpi == 'true' }}
@@ -268,7 +268,7 @@ jobs:
             ./DietPi*.sha256
 
     outputs:
-      armbian-artifacts: ${{ steps.armbian_artifacts.outputs.artifact-id }}
+      # armbian-artifacts: ${{ steps.armbian_artifacts.outputs.artifact-id }}
       dietpi-artifacts: ${{ steps.dietpi_artifacts.outputs.artifact-id }}
 
   release:
