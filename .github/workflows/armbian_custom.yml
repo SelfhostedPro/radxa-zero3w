@@ -68,9 +68,9 @@ jobs:
       - name: Create Matrix
         id: matrix
         run: |
-          echo "kernels=$(jq 'split(",")' -Rc <(echo '${{ inputs.kernel_versions || 'vendor,legacy' }}'))" >> $GITHUB_OUTPUT
-          echo "image_type=$(jq 'split(",")' -Rc <(echo '${{ inputs.image_type || 'minimal,server' }}'))" >> $GITHUB_OUTPUT
-          echo "releases=$(jq 'split(",")' -Rc <(echo '${{ inputs.debian_releases || 'bookworm,trixie' }}'))" >> $GITHUB_OUTPUT
+          echo "kernels=$(jq 'split(",")' -Rc <(echo '${{ inputs.kernel_versions || 'vendor' }}'))" >> $GITHUB_OUTPUT
+          echo "image_type=$(jq 'split(",")' -Rc <(echo '${{ inputs.image_type || 'minimal' }}'))" >> $GITHUB_OUTPUT
+          echo "releases=$(jq 'split(",")' -Rc <(echo '${{ inputs.debian_releases || 'trixie' }}'))" >> $GITHUB_OUTPUT
       - name: Check Matrix
         id: check
         run: |
