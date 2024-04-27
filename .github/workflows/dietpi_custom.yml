@@ -1,9 +1,19 @@
 name: "Build Custom Armbian Images"
 run-name: "Building ${{ github.ref_name }} Custom Armbian Images #${{ github.run_number }}"
 on:
-  push:
+  # push:
   workflow_dispatch:
     inputs:
+      build_dietpi:
+        description: Build DietPi?
+        required: false
+        default: true
+        type: boolean
+      build_armbian:
+        description: Build Armbian?
+        required: false
+        default: false
+        type: boolean
       debian_releases:
         description: comma separated list of debian releases to build
         default: bookworm,trixie
@@ -34,11 +44,6 @@ on:
         default: 24.5.0-trunk.469
         required: false
         type: string
-      build_dietpi:
-        description: Build DietPi?
-        required: false
-        default: true
-        type: boolean
       dietpi-owner:
         description: DietPi Repo Owner
         default: MichaIng
@@ -92,13 +97,15 @@ jobs:
           echo "Build DietPi? ${{ inputs.build_dietpi || true }}"
           echo "build_dietpi=${{ inputs.build_dietpi || true }}" >> $GITHUB_OUTPUT
 
+          echo "Build Armbian? ${{ inputs.build_armbian || false }}"
+          echo "build_armbian=${{ inputs.build_armbian || false }}" >> $GITHUB_OUTPUT
 
           echo "DietPi Owner: ${{ inputs.dietpi_owner || 'MichaIng' }}"
           echo "dietpi_owner=${{ inputs.dietpi_owner || 'MichaIng' }}" >> $GITHUB_OUTPUT
 
 
-          echo "DietPi Branch: ${{ inputs.dietpi_branch || 'dev' }}"
-          echo "dietpi_branch=${{ inputs.dietpi_branch || 'dev' }}" >> $GITHUB_OUTPUT
+          echo "DietPi Branch: ${{ inputs.dietpi_branch || 'newimages' }}"
+          echo "dietpi_branch=${{ inputs.dietpi_branch || 'newimages' }}" >> $GITHUB_OUTPUT
 
           echo "Building for Kernel(s): ${{ steps.matrix.outputs.kernels }}"
           echo "Building Debian Release(s): ${{ steps.matrix.outputs.releases}}"
@@ -115,6 +122,7 @@ jobs:
       kernels: ${{ steps.matrix.outputs.kernels }}
 
   build-armbian:
+    if: ${{ needs.setup.outputs.build_armbian == true }}
     continue-on-error: true
     # Create a matrix of all the types of images that we want to build.
     strategy:
@@ -126,6 +134,7 @@ jobs:
 
     name: "${{ matrix.ui }} | ${{ matrix.release }}-${{ matrix.kernel }}"
     env:
+      build_armbian: ${{ needs.setup.outputs.build_armbian }}
       make_release: ${{ needs.setup.outputs.make_release }}
       armbian_version: ${{ needs.setup.outputs.armbian_version }}
       board: ${{ needs.setup.outputs.board }}
@@ -210,8 +219,8 @@ jobs:
           DESKTOP_ENVIRONMENT_CONFIG_NAME="${DESKTOP_ENVIRONMENT_CONFIG_NAME}" \
           SHARE_LOG="yes" \
           BETA="yes" \
-          EXPERT="yes"
-          # BOOTFS_TYPE="fat" 
+          EXPERT="yes" \
+          BOOTFS_TYPE="fat" 
           # ENABLE_EXTENSIONS="usb-gadget-ums" \
 # BOOTPART_REQUIRED
 # ARMBIAN_IMAGE_BUILD_BOOTFS_TYPE
@@ -234,30 +243,24 @@ jobs:
         if: ${{ env.build_dietpi == 'true' }}
         run: |
           sudo unxz -k build/output/images/*.xz
+    outputs:
+      armbian-artifacts: ${{ steps.armbian_artifacts.outputs.artifact-id }}
 
-      - name: List all outputs
-        if: ${{ env.build_dietpi == 'true' }}
-        run: |
-          ls -R build/output/images/
-
-      - name: Build Diet PI
-        if: ${{ env.build_dietpi == 'true' }}
-        shell: bash
+  build-dietpi:
+    runs-on: ubuntu-latest
+    needs: setup
+    env:
+      dietpi_owner: ${{ needs.setup.outputs.dietpi_owner }}
+      dietpi_branch: ${{ needs.setup.outputs.dietpi_branch }}
+    steps:
+      - name: Build DietPi
+        id: dietpi-build
         env:
           G_GITOWNER: ${{ env.dietpi_owner }}
           G_GITBRANCH: ${{ env.dietpi_branch }}
-          FP_ROOT_DEV: /dev/loop0p2
-          CLONING_TOOL: dd
-          OUTPUT_IMG_NAME: DietPi_${{ env.board }}-${{matrix.ui}}-${{ matrix.release }}-${{ matrix.kernel }}
-          OUTPUT_IMG_EXT: img
         run: |
-          sudo --preserve-env bash -c "$(curl -sSfL 'https://raw.githubusercontent.com/${{ env.dietpi_owner }}/DietPi/${{ env.dietpi_branch }}/.build/images/dietpi-imager')" -i build/output/images/*.img
+          sudo --preserve-env bash -c "$(curl -sSf "https://raw.githubusercontent.com/${{ env.dietpi_owner }}/DietPi/${{ env.dietpi_branch }}/.build/images/dietpi-build")" 'DietPi-Build' -m 90 -d 8
 
-      # - name: List all outputs
-      #   if: ${{ env.BUILD_DIETPI == 'true' }}
-      #   run: |
-      #     ls -R .
-      # Upload Armbian images to artifacts (we'll download them and add them to the release later).
       - name: Upload DietPi Artifacts for Release
         id: dietpi_artifacts
         uses: actions/upload-artifact@v4
@@ -266,14 +269,16 @@ jobs:
           path: |
             ./DietPi*.xz
             ./DietPi*.sha256
-
     outputs:
-      armbian-artifacts: ${{ steps.armbian_artifacts.outputs.artifact-id }}
       dietpi-artifacts: ${{ steps.dietpi_artifacts.outputs.artifact-id }}
 
   release:
     runs-on: ubuntu-latest
-    needs: [build-armbian, setup]
+    needs: [build-armbian, build-dietpi, setup]
+    if: |
+      always() && 
+      ( needs.build-armbian.result == 'success' || needs.build-armbian.result == 'skipped' ) &&
+      ( needs.build-dietpi.result == 'success' || needs.build-dietpi.result == 'skipped' )
     env:
       make_release: ${{ needs.setup.outputs.make_release }}
       armbian_version: ${{ needs.setup.outputs.armbian_version }}
