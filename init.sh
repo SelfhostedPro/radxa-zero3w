@@ -1,7 +1,3 @@
-
-
-
-
 # losetup -f # Find loopback devices
 # mount -v 
 loopback_dev="$(losetup -f)"
