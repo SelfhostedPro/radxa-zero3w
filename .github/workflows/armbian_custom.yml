@@ -170,6 +170,8 @@ jobs:
           mkdir -pv build/userpatches
           rsync -av os/userpatches/. build/userpatches/
           [[ -d custom/userpatches ]] && rsync -av custom/userpatches/. build/userpatches/
+          ls -R custom
+          ls build/userpatches
 
       - name: Compile Armbian ${{ matrix.release }}-${{ matrix.kernel }}
         id: compile
