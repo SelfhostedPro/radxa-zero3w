@@ -200,6 +200,8 @@ jobs:
           cd build
           git checkout main
 
+          ls userpatches
+
           # execute build command
           ./compile.sh "build" \
           REVISION="${{ env.armbian_version }}" \
